@@ -1,7 +1,7 @@
 clc;clear all;close all
 
 %Set up simulation parameters
-tf = 40;
+tf = 60;
 dt = 0.1;
 
 %Initial Conditions
@@ -31,7 +31,7 @@ t = 0:dt:tf;
 x = zeros(length(t));
 y = zeros(length(t));
 theta = zeros(length(t));
-d = zeros(length(t));
+d = zeros(length(t),1);
 x(1) = x0;
 y(1) = y0;
 theta(1) = theta0;
@@ -86,7 +86,16 @@ for i=2:length(t)
     [e_t d(i)] = calculate_errors([x(i-1) y(i-1)], theta(i-1), p1, p2);
     
     %% Calculate Controller
-    V = 1; %constant forward velocity (not that great of an idea)
+    k_v = 0.1;
+    V_max = 1;
+    V_min = 0.2;
+%   V = 1; %constant forward velocity (not that great of an idea)
+    V = k_v/abs(e_t);
+    if (V>V_max)
+        V = V_max;
+    elseif (V<V_min)
+        V = V_min;
+    end
     w = e_t + atan2(k_p * d(i),V);
 
     %% Simulate dynamics
